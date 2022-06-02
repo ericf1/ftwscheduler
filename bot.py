@@ -184,7 +184,7 @@ async def mainLoop():
         allMessages = listDocMessage()
         if allMessages:
             for message in allMessages:
-                if time.time() >= message.get("scheduled_time"):
+                if time.time() >= message.get("scheduled_time") + 14400:
                     for channel in message.get("channel_ids"):
                         await bot.get_channel(
                             int(channel[2:-1])).send(message.get("content"))
