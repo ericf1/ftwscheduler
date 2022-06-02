@@ -107,7 +107,7 @@ async def list(ctx):
         content = message.get("content")
         channels = ' '.join(message.get("channel_ids"))
         embed = discord.Embed(
-            title=f"Scheduled for {dt}", description=f"{content} \n \n Sending to: {channels} with Message Id: {i+1}")
+            title=f"Scheduled for {dt}", description=f"{content} \n \n Sending To: {channels} \n Message Id: {i+1}")
         await ctx.send(embed=embed)
     await addReaction(ctx)
 
