@@ -27,5 +27,5 @@ FTW Scheduler Bot's prefix is ``f!``, add it to the start of any of this bot's c
 | list | None | Lists out all of the messages that your server has scheduled and information about the messages | ``f!list``|
 | add | ``{formatted-time}`` | Answer and react to the series of prompts to save your message into the database | ``f!addMessage 4/2/2003-13:11``|
 | remove |``{message-id}`` | Removes the message based on its id | ``f!remove 1`` | 
-| ping | None | Pong | ``s!ping`` |
+| ping | None | Pong | ``f!ping`` |
 
