@@ -1,8 +1,18 @@
 # FTW Scheduler Bot
 
+A Discord bot for scheduling messages to send.
+
+Features
+---
+- Easy to understand prompts
+- Consistant
+- Easy to use
+
 Important Notes When Running The Bot
 ---
-Note that the time for addMessage is military time (24-hours). All time is localized to EST you can use an online converter for now (this may change later). Time is formatted like this: ``mm/dd/YY-HH:MM``. You should check to see if your time is right by doing f!list when you have saved your message.
+Note that the time for addMessage is military time (24-hours). All time is localized to EST you can use an online converter for now (this may change later). 
+
+Time is formatted like this: ``mm/dd/YY-HH:MM``. You should check to see if your time is right by doing f!list when you have saved your message.
 
 Messages that are scheduled before right now will automatically send.
 
