@@ -10,7 +10,7 @@ Features
 
 Important Notes When Running The Bot
 ---
-Note that the time for addMessage is military time (24-hours). All time is localized to EST you can use an online converter for now (this may change later). 
+Note that the time for the add command is military time (24-hours). All time is localized to EST you can use an online converter for now (this may change later). 
 
 Time is formatted like this: ``mm/dd/YY-HH:MM``. You should check to see if your time is right by doing f!list when you have saved your message.
 
@@ -25,7 +25,7 @@ FTW Scheduler Bot's prefix is ``f!``, add it to the start of any of this bot's c
 | Command | Arguments | Description | Example |
 |---------|-----------|-------------|---------|
 | list | None | Lists out all of the messages that your server has scheduled and information about the messages | ``f!list``|
-| addMessage | ``{formatted-time}`` | Answer and react to the series of prompts to save your message into the database | ``f!addMessage 4/2/2003-13:11``|
-| removeMessage |``{message-id}`` | Removes the message based on its id | ``f!remove 1`` | 
+| add | ``{formatted-time}`` | Answer and react to the series of prompts to save your message into the database | ``f!addMessage 4/2/2003-13:11``|
+| remove |``{message-id}`` | Removes the message based on its id | ``f!remove 1`` | 
 | ping | None | Pong | ``s!ping`` |
 
