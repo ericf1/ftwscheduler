@@ -1,1 +1,2 @@
-# ftwscheduler
+# FTW Scheduler Bot
+
