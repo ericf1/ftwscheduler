@@ -83,7 +83,7 @@ async def hasPerms(ctx):
 
 
 @ bot.command()
-async def removeMessage(ctx, id):
+async def remove(ctx, id):
     if not await hasPerms(ctx):
         return
     removeDocMessage(id, ctx.guild.id)
@@ -100,20 +100,20 @@ async def list(ctx):
         await ctx.send("You have no messages :(")
         return
 
-    for i, message in enumerate(allMessages):
+    for message in allMessages:
         if message.get("server_id") != ctx.guild.id:
             continue
         dt = datetime.fromtimestamp(message.get("scheduled_time"))
         content = message.get("content")
         channels = ' '.join(message.get("channel_ids"))
         embed = discord.Embed(
-            title=f"Scheduled for {dt}", description=f"{content} \n \n Sending To: {channels} \n Message Id: {i+1}")
+            title=f"Scheduled for {dt}", description=f"{content} \n \n Sending To: {channels} \n Message Id: {message.doc_id}")
         await ctx.send(embed=embed)
     await addReaction(ctx)
 
 
 @ bot.command()
-async def addMessage(ctx, time: parse_time):
+async def add(ctx, time: parse_time):
     if not await hasPerms(ctx):
         return
 
@@ -162,32 +162,35 @@ async def addMessage(ctx, time: parse_time):
     await addReaction(ctx)
 
 
-@ addMessage.error
-async def addMessage_error(ctx, error):
-    await ctx.send(str(error))
+@ add.error
+async def add_error(ctx, error):
+    await ctx.send(repr(error))
 
 
-@ removeMessage.error
-async def removeMessage_error(ctx, error):
-    await ctx.send(str(error))
+@ remove.error
+async def remove_error(ctx, error):
+    await ctx.send(repr(error))
 
 
 @ list.error
 async def list_error(ctx, error):
-    await ctx.send(str(error))
+    await ctx.send(repr(error))
 
 
 @tasks.loop(seconds=1.0)  # repeat every 1 seconds
 async def mainLoop():
     await bot.wait_until_ready()
-    allMessages = listDocMessage()
-    if allMessages:
-        for i, message in enumerate(allMessages):
-            if time.time() >= message.get("scheduled_time"):
-                for channel in message.get("channel_ids"):
-                    await bot.get_channel(
-                        int(channel[2:-1])).send(message.get("content"))
-                    db.remove(doc_ids=[i + 1])
+    try:
+        allMessages = listDocMessage()
+        if allMessages:
+            for message in allMessages:
+                if time.time() >= message.get("scheduled_time"):
+                    for channel in message.get("channel_ids"):
+                        await bot.get_channel(
+                            int(channel[2:-1])).send(message.get("content"))
+                        db.remove(doc_ids=[message.doc_id])
+    except Exception as e:
+        print(repr(e))
 
 if __name__ == '__main__':
     mainLoop.start()
