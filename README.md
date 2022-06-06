@@ -2,6 +2,10 @@
 
 A Discord bot for scheduling messages to send.
 
+Invite Link
+---
+[Link](https://discord.com/api/oauth2/authorize?client_id=981283618297106432&permissions=139586848832&scope=bot)
+
 Features
 ---
 - Easy to understand prompts
