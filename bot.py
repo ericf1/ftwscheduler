@@ -14,35 +14,35 @@ bot = commands.Bot(command_prefix='f!')
 db = TinyDB('schedule.json')
 
 # schema:
-# messageId: {content:content, server_id:serverId, channel_id:channelId, scheduled_time:scheduledTime}
+# messageId: {content:content, server_id:server_id, channel_id:channel_id, scheduled_time:scheduled_time}
 
 
-def listDocMessage():
+def list_doc_message():
     return db.all()
 
 
-def editDocMessage(messageId, clientServerId, channelIds, content, scheduledTime):
-    message = db.get(doc_id=messageId)
-    if clientServerId != message.get("server_id"):
+def edit_doc_message(message_id, client_server_id, channel_ids, content, scheduled_time):
+    message = db.get(doc_id=message_id)
+    if client_server_id != message.get("server_id"):
         raise Exception("This message does not exist")
 
     message.update({'content': content,
-                    'scheduled_time': scheduledTime,
-                    "channel_ids": channelIds}, doc_id=messageId)
+                    'scheduled_time': scheduled_time,
+                    "channel_ids": channel_ids}, doc_id=message_id)
 
 
-def addDocMessage(serverId, channelIds, content, scheduledTime):
+def add_doc_message(server_id, channel_ids, content, scheduled_time):
     db.insert({'content': content,
-               'scheduled_time': scheduledTime,
-               "server_id": serverId,
-               "channel_ids": channelIds})
+               'scheduled_time': scheduled_time,
+               "server_id": server_id,
+               "channel_ids": channel_ids})
 
 
-def removeDocMessage(messageId, clientServerId):
-    message = db.get(doc_id=messageId)
-    if clientServerId != message.get("server_id"):
+def remove_doc_message(message_id, client_server_id):
+    message = db.get(doc_id=message_id)
+    if client_server_id != message.get("server_id"):
         raise Exception("This message does not exist")
-    db.remove(doc_ids=[int(messageId)])
+    db.remove(doc_ids=[int(message_id)])
 
 
 @bot.event
@@ -50,13 +50,13 @@ async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
 
 
-async def addReaction(ctx): await ctx.message.add_reaction("✅")
+async def add_reaction(ctx): await ctx.message.add_reaction("✅")
 
 
 @bot.command()
 async def ping(ctx):
     await ctx.send('Pong')
-    await addReaction(ctx)
+    await add_reaction(ctx)
 
 
 def parse_time(givenTime):
@@ -69,38 +69,38 @@ def parse_time(givenTime):
     return date_time_obj.timestamp()
 
 
-def checkStop(stop: str):
+def check_stop(stop: str):
     if stop == "quit":
         return True
     return False
 
 
-async def hasPerms(ctx):
-    hasPerms = ctx.author.permissions_in(ctx.channel).manage_channels
-    if not hasPerms:
+async def has_perms(ctx):
+    has_perms = ctx.author.permissions_in(ctx.channel).manage_channels
+    if not has_perms:
         await ctx.send("You do not have permission to use this command.")
-    return hasPerms
+    return has_perms
 
 
 @ bot.command()
 async def remove(ctx, id):
-    if not await hasPerms(ctx):
+    if not await has_perms(ctx):
         return
-    removeDocMessage(id, ctx.guild.id)
-    await addReaction(ctx)
+    remove_doc_message(id, ctx.guild.id)
+    await add_reaction(ctx)
 
 
 @ bot.command()
 async def list(ctx):
-    if not await hasPerms(ctx):
+    if not await has_perms(ctx):
         return
-    allMessages = listDocMessage()
+    all_messages = list_doc_message()
 
-    if not allMessages:
+    if not all_messages:
         await ctx.send("You have no messages :(")
         return
 
-    for message in allMessages:
+    for message in all_messages:
         if message.get("server_id") != ctx.guild.id:
             continue
         dt = datetime.fromtimestamp(message.get("scheduled_time"))
@@ -109,12 +109,12 @@ async def list(ctx):
         embed = discord.Embed(
             title=f"Scheduled for {dt}", description=f"{content} \n \n Sending To: {channels} \n Message Id: {message.doc_id}")
         await ctx.send(embed=embed)
-    await addReaction(ctx)
+    await add_reaction(ctx)
 
 
 @ bot.command()
 async def add(ctx, time: parse_time):
-    if not await hasPerms(ctx):
+    if not await has_perms(ctx):
         return
 
     def check(msg):
@@ -122,17 +122,17 @@ async def add(ctx, time: parse_time):
 
     await ctx.send("What channels do you want to send the message to? Write quit if you want to exit.")
     channels = await bot.wait_for('message', timeout=60, check=check)
-    if checkStop(channels):
+    if check_stop(channels):
         await ctx.send("Exiting... To restart, rerun the command")
         return
 
-    channelsList = channels.content.split()
-    for oneChannel in channelsList:
-        match = re.match(r'<#[0-9]{18}>', oneChannel)
+    channels_list = channels.content.split()
+    for one_channel in channels_list:
+        match = re.match(r'<#[0-9]{18}>', one_channel)
         if not match.group(0):
-            await ctx.send(f'{oneChannel} is not a valid channel format')
+            await ctx.send(f'{one_channel} is not a valid channel format')
             return
-        await ctx.send(oneChannel)
+        await ctx.send(one_channel)
     msg = await ctx.send("Are these the correct channels? Make sure that I have permission to write in those channels!")
     await msg.add_reaction('👍')
     await msg.add_reaction('👎')
@@ -143,23 +143,23 @@ async def add(ctx, time: parse_time):
         return
     await ctx.send('Perfect! Now write the exact message that you want to send. Write quit if you want to exit.')
 
-    msgContent = await bot.wait_for('message', timeout=120, check=check)
-    if checkStop(msgContent):
+    msg_content = await bot.wait_for('message', timeout=120, check=check)
+    if check_stop(msg_content):
         await ctx.send("Exiting... To restart, rerun the command")
         return
 
-    await ctx.send(msgContent.content)
-    msgConfirm = await ctx.send("Does this look like the message you want to send?")
-    await msgConfirm.add_reaction('👍')
-    await msgConfirm.add_reaction('👎')
+    await ctx.send(msg_content.content)
+    msg_confirm = await ctx.send("Does this look like the message you want to send?")
+    await msg_confirm.add_reaction('👍')
+    await msg_confirm.add_reaction('👎')
     reaction, user = await bot.wait_for('reaction_add', timeout=120,
                                         check=lambda reaction, user: (reaction.emoji == '👍' or reaction.emoji == '👎') and user == ctx.author)
     if reaction.emoji == '👎':
         await ctx.send("Exiting... To restart, rerun the command")
         return
     await ctx.send('Amazing! We are going to add your message. Use f!list to see your scheduled messages')
-    addDocMessage(ctx.guild.id, channelsList, msgContent.content, time)
-    await addReaction(ctx)
+    add_doc_message(ctx.guild.id, channels_list, msg_content.content, time)
+    await add_reaction(ctx)
 
 
 @ add.error
@@ -178,20 +178,22 @@ async def list_error(ctx, error):
 
 
 @tasks.loop(seconds=1.0)  # repeat every 1 seconds
-async def mainLoop():
+async def main_loop():
     await bot.wait_until_ready()
     try:
-        allMessages = listDocMessage()
-        if allMessages:
-            for message in allMessages:
-                if time.time() >= message.get("scheduled_time") + 14400:
-                    for channel in message.get("channel_ids"):
-                        await bot.get_channel(
-                            int(channel[2:-1])).send(message.get("content"))
-                        db.remove(doc_ids=[message.doc_id])
+        allMessages = list_doc_message()
+        if not allMessages:
+            return
+        for message in allMessages:
+            if not time.time() >= message.get("scheduled_time") + 14400:
+                return
+            for channel in message.get("channel_ids"):
+                await bot.get_channel(
+                    int(channel[2:-1])).send(message.get("content"))
+                db.remove(doc_ids=[message.doc_id])
     except Exception as e:
         print(repr(e))
 
 if __name__ == '__main__':
-    mainLoop.start()
+    main_loop.start()
     bot.run(os.getenv('DISCORD_TOKEN'))
